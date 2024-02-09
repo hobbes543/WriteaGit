@@ -25,6 +25,7 @@ def main(argv=sys.argv[1:]):
         case "checkout"             : cmd_checkout(args)
         case "commit"               : cmd_commit(args)
         case "hash-objects"         : cmd_hash_objects(args)
+        case "init"                 : cmd_init(args)
         case "log"                  : cmd_log(args)
         case "ls-files"             : cmd_ls_files(args)
         case "ls-tree"              : cmd_ls_tree(args)
@@ -123,7 +124,27 @@ def repo_create(path):
     
     with open(repo_file(repo, "config"), "w") as f:
         config = repo_default_config()
-        config.write()
+        config.write(f)
     
     return repo
 
+def repo_default_config():
+    ret = configparser.ConfigParser()
+
+    ret.add_section("core")
+    ret.set("core", "repositoryformatversion", "0")
+    ret.set("core", "filemode", "false")
+    ret.set("core", "bare", 'false')
+
+    return ret
+
+argsp = argsubparsers.add_parser("init", help="Initialize a new, empty repository.")
+
+argsp.add_argument("path",
+                   metavar="directory",
+                   nargs="?",
+                   default=".",
+                   help="Where to create the repository.")
+
+def cmd_init(args):
+    repo_create(args.path)
